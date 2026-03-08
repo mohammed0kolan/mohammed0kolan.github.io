@@ -99,77 +99,43 @@ function updateOrderSummary() {
     sendBtn.disabled = total === 0;
   }
 }
-
 function createProductCard(product) {
   const card = document.createElement("div");
   card.className = "product-card";
 
-  const imageWrapper = document.createElement("div");
-  imageWrapper.className = "product-image-wrapper";
-  const img = document.createElement("img");
-  img.src = product.image;
-  img.alt = product.name;
-  imageWrapper.appendChild(img);
+  card.innerHTML = `
+    <div class="product-image-wrapper">
+      <img src="${product.image}" alt="${product.name}">
+    </div>
+    <div class="product-body">
+      <h3 class="product-title">${product.name}</h3>
+      <p class="product-description">${product.description}</p>
+      <div class="product-price-row">
+        <span>${product.price} دينار</span>
+      </div>
+      <div class="product-controls">
+        <div class="qty-control">
+          <button type="button" class="qty-btn" aria-label="تقليل الكمية">−</button>
+          <span class="qty-value">0</span>
+          <button type="button" class="qty-btn" aria-label="زيادة الكمية">+</button>
+        </div>
+        <button type="button" class="add-btn">أضف للطلب</button>
+      </div>
+    </div>
+  `;
 
-  const body = document.createElement("div");
-  body.className = "product-body";
-
-  const title = document.createElement("h3");
-  title.className = "product-title";
-  title.textContent = product.name;
-
-  const desc = document.createElement("p");
-  desc.className = "product-description";
-  desc.textContent = product.description;
-
-  const priceRow = document.createElement("div");
-  priceRow.className = "product-price-row";
-  const priceSpan = document.createElement("span");
-  priceSpan.textContent = `${product.price} دينار`;
-  priceRow.appendChild(priceSpan);
-
-  const controls = document.createElement("div");
-  controls.className = "product-controls";
-
-  const qtyControl = document.createElement("div");
-  qtyControl.className = "qty-control";
-
-  const minusBtn = document.createElement("button");
-  minusBtn.type = "button";
-  minusBtn.className = "qty-btn";
-  minusBtn.setAttribute("aria-label", "تقليل الكمية");
-  minusBtn.textContent = "−";
-
-  const qtySpan = document.createElement("span");
-  qtySpan.className = "qty-value";
-
-  const plusBtn = document.createElement("button");
-  plusBtn.type = "button";
-  plusBtn.className = "qty-btn";
-  plusBtn.setAttribute("aria-label", "زيادة الكمية");
-  plusBtn.textContent = "+";
-
-  qtyControl.appendChild(minusBtn);
-  qtyControl.appendChild(qtySpan);
-  qtyControl.appendChild(plusBtn);
-
-  const addBtn = document.createElement("button");
-  addBtn.type = "button";
-  addBtn.className = "add-btn";
+  const minusBtn = card.querySelector(".qty-control .qty-btn:first-child");
+  const qtySpan = card.querySelector(".qty-value");
+  const plusBtn = card.querySelector(".qty-control .qty-btn:last-child");
+  const addBtn = card.querySelector(".add-btn");
 
   function sync() {
     const qty = quantities[product.id] || 0;
     qtySpan.textContent = String(qty);
 
-    if (qty === 0) {
-      minusBtn.disabled = true;
-      addBtn.disabled = false;
-      addBtn.textContent = "أضف للطلب";
-    } else {
-      minusBtn.disabled = false;
-      addBtn.disabled = true;
-      addBtn.textContent = "تمت الإضافة";
-    }
+    minusBtn.disabled = qty === 0;
+    addBtn.disabled = qty > 0;
+    addBtn.textContent = qty === 0 ? "أضف للطلب" : "تمت الإضافة";
   }
 
   plusBtn.addEventListener("click", () => {
@@ -179,10 +145,7 @@ function createProductCard(product) {
   });
 
   minusBtn.addEventListener("click", () => {
-    quantities[product.id] = Math.max(
-      0,
-      (quantities[product.id] || 0) - 1,
-    );
+    quantities[product.id] = Math.max(0, (quantities[product.id] || 0) - 1);
     sync();
     updateOrderSummary();
   });
@@ -195,19 +158,7 @@ function createProductCard(product) {
     }
   });
 
-  controls.appendChild(qtyControl);
-  controls.appendChild(addBtn);
-
-  body.appendChild(title);
-  body.appendChild(desc);
-  body.appendChild(priceRow);
-  body.appendChild(controls);
-
-  card.appendChild(imageWrapper);
-  card.appendChild(body);
-
   sync();
-
   return card;
 }
 
