@@ -232,7 +232,8 @@ function sendOrder() {
   if (!orderItems) return;
 
   const message = `مرحباً! أرغب بطلب:\n\n${orderItems}\n\nالمجموع: ${calculateTotal()} دينار`;
-  const whatsappUrl = `https://wa.me/218916282461?text=${encodeURIComponent(
+
+  const whatsappUrl = `https://wa.me/218946282461?text=${encodeURIComponent(
     message,
   )}`;
   window.open(whatsappUrl, "_blank");
@@ -240,7 +241,7 @@ function sendOrder() {
 
 function openHeroWhatsApp() {
   const message = "مرحباً! أنا مهتم بالطلب من Sugar Stories.";
-  const whatsappUrl = `https://wa.me/218916282461?text=${encodeURIComponent(
+  const whatsappUrl = `https://wa.me/218946282461?text=${encodeURIComponent(
     message,
   )}`;
   window.open(whatsappUrl, "_blank");
