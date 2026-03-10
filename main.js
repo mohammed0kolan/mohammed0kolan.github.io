@@ -1,32 +1,32 @@
 const products = [
   {
     id: 1,
-    name: "كيكة الشوكولاتة الفاخرة",
-    description: "كيكة شوكولاتة غنية مع غاناش مخملي",
-    price: 85,
+    name: "إهرامات الكندر",
+    description: "حشوة كريم الكندر وشوكولاتة فاخرة - السعر 6 د القطعة (أقل عدد 10 قطع)",
+    price: 6,
     image: "IMG/chocoPyramides.jpg",
   },
   {
     id: 2,
-    name: "بانكيك بالتوت",
-    description: "بانكيك هش مع التوت الطازج والشراب",
-    price: 45,
-    image: "IMG/circles.jpg",
+    name: "بيتي فور",
+    description: "بيتي فور هش ولذيذ مصنوع من الزبدة الفاخرة، يتميز بقوامه الناعم وطعمه الغني الذي يذوب في الفم، ومزين بالفستق ليكون خيارًا مثالياً للضيافة والمناسبات.",
+    price: 2.5,
+    image: "IMG/BT4.jpeg",
   },
   {
     id: 3,
-    name: "تورتة أنيقة",
-    description: "تورتة إيطالية كلاسيكية مع حشوة الكريمة",
-    price: 95,
-    image: "IMG/snowPyramids.jpg",
+    name: "تارت الليمون ",
+    description: "تارت هش، بحشوة كريم الليمون والبستاشيو وغلال الغابة، فخمة جدا جدا وخيار مثالي للمناسبات.",
+    price: 6,
+    image: "IMG/lemonTart.jpeg",
   },
   {
     id: 4,
-    name: "بقلاوة تقليدية",
-    description: "طبقات مقرمشة مع العسل والفستق",
-    price: 55,
-    image: "IMG/lemon.jpg",
-  },
+    name: "سويتز",
+    description: "رول سويتز حشوة نوتيلا ومكسرات ",
+    price: 4,
+    image: "IMG/browensweets.png",
+  },/*
   {
     id: 5,
     name: "علبة شوكولاتة فاخرة",
@@ -54,7 +54,7 @@ const products = [
     description: "كيكة إسفنجية خفيفة مع الفراولة الطازجة",
     price: 75,
     image: "IMG/lemon.jpg",
-  },
+  },*/
 ];
 
 const quantities = Object.fromEntries(products.map((p) => [p.id, 0]));
@@ -129,33 +129,67 @@ function createProductCard(product) {
   const plusBtn = card.querySelector(".qty-control .qty-btn:last-child");
   const addBtn = card.querySelector(".add-btn");
 
+  const minQty = product.id === 1 ? 10 : 1; 
+
   function sync() {
     const qty = quantities[product.id] || 0;
     qtySpan.textContent = String(qty);
-
     minusBtn.disabled = qty === 0;
-    addBtn.disabled = qty > 0;
-    addBtn.textContent = qty === 0 ? "أضف للطلب" : "تمت الإضافة";
+
+    if (product.id === 1) {
+      addBtn.disabled = qty < minQty;
+      addBtn.textContent = qty < minQty
+        ? `أضف للطلب (الحد الأدنى ${minQty})`
+        : "تمت الإضافة";
+    } else {
+      addBtn.disabled = qty > 0;
+      addBtn.textContent = qty === 0 ? "أضف للطلب" : "تمت الإضافة";
+    }
   }
 
   plusBtn.addEventListener("click", () => {
-    quantities[product.id] = (quantities[product.id] || 0) + 1;
+    if (product.id === 1) {
+      if (quantities[product.id] || 0 >= minQty) {
+        quantities[product.id] = (quantities[product.id] || 0) + 1;
+      }
+      if ((quantities[product.id] || 0) < minQty) {
+        quantities[product.id] = minQty;
+      }
+    } else {
+      quantities[product.id] = (quantities[product.id] || 0) + 1;
+    }
     sync();
     updateOrderSummary();
   });
 
   minusBtn.addEventListener("click", () => {
-    quantities[product.id] = Math.max(0, (quantities[product.id] || 0) - 1);
+    const current = quantities[product.id] || 0;
+    if (product.id === 1) {
+      if (current === minQty) {
+        quantities[product.id] = 0;
+      } else {
+        quantities[product.id] = Math.max(minQty, current - 1);
+      }
+    } else {
+      quantities[product.id] = Math.max(0, current - 1);
+    }
     sync();
     updateOrderSummary();
   });
 
   addBtn.addEventListener("click", () => {
-    if ((quantities[product.id] || 0) === 0) {
-      quantities[product.id] = 1;
-      sync();
-      updateOrderSummary();
+    const current = quantities[product.id] || 0;
+
+    if (product.id === 1) {
+      if (current < minQty) {
+        quantities[product.id] = minQty;
+      }
+    } else {
+      if (current === 0) quantities[product.id] = 1;
     }
+
+    sync();
+    updateOrderSummary();
   });
 
   sync();
